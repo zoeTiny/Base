@@ -1,27 +1,152 @@
+/*
+ *  Copyright (C) 2015 Rayman Yan
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
 apply plugin: 'com.android.library'
+//apply plugin: 'maven-publish'
+//Androiddevmetrics based on sdk 21
+//apply plugin: 'com.frogermcs.androiddevmetrics'
+apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'realm-android'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 26
-        versionCode 1
-        versionName "1.0"
-
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.libVersionCode
+        buildConfigField "String", "AppVersion", "\"" + rootProject.ext.versionName + "\""
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
+    }
+    dataBinding {
+        enabled = true
+    }
+    compileOptions {
+        sourceCompatibility rootProject.ext.sourceCompatibilityVersion
+        targetCompatibility rootProject.ext.targetCompatibilityVersion
     }
     buildTypes {
+        debug {
+            minifyEnabled false
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+    publishNonDefault true
+    defaultPublishConfig rootProject.ext.libDefaultPublish
+    configurations.all {
+        resolutionStrategy.force 'com.google.code.findbugs:jsr305:3.0.1'
+    }
+}
+
+//afterEvaluate {
+//    android.libraryVariants.each { variant ->
+//        if (variant.buildType.name == "release") {
+//            publishing.publications.create variant.flavorName, MavenPublication, {
+//                groupId group
+//                version version
+//                artifactId "$project.name"
+//                artifact(variant.outputs.outputFile.get(0)) {
+//                    classifier "$variant.flavorName"
+//                }
+//            }
+//        }
+//    }
+//    publishToMavenLocal.dependsOn tasks.assemble
+//    publish.dependsOn tasks.assemble
+//}
+
+retrolambda {
+    javaVersion rootProject.ext.retrolambdaJavaVersion
+    defaultMethods true
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:26.+'
+
+    compile depMap.RecyclerView
+    compile depMap.CardView
+    compile depMap.Multidex
+    compile depMap.Design
+    compile depMap.AppCompat
+    compile depMap.ConstraintLayout
+    compile depMap.FlexBox
+
+    compile depMap.Glide
+    compile depMap.GlideOkhttpIntegration
+    compile depMap.OkHttp
+    compile depMap.LoggingInterceptor
+    compile depMap.Retrofit
+    compile depMap.RxJavaAdapter
+
+    compile depMap.Timber
+
+    compile depMap.RxBinding
+    compile depMap.RxBindingAppcompat
+    compile depMap.RxPermissions
+
+    compile depMap.RxJava
+    compile depMap.RxAndroid
+    compile depMap.RxJavaProguard
+    compile depMap.RxLifecycle
+    compile depMap.RxLifecycleAndroid
+
+    compile depMap.Dagger
+    annotationProcessor depMap.DaggerCompile
+
+    compile depMap.Moshi
+    compile depMap.MoshiConverter
+
+    compile depMap.Guava
+    compile depMap.Zxing
+    compile depMap.ZxingCore
+
+    debugCompile depMap.Stetho
+    debugCompile depMap.StethoRealm
+    debugCompile depMap.StethoOkhttp3
+
+    provided depMap.JavaxAnnotations
+
+    compile depMap.QiNiu
+    compile depMap.Umeng
+    compile depMap.Pinyin
+    compile depMap.SwipeDelMenuLayout
+    compile depMap.TencentBugly
+
+    debugCompile depMap.StethoRealm
+    debugCompile depMap.Stetho
+    debugCompile depMap.StethoOkhttp3
+
+    retrolambdaConfig depMap.RetroLambdaConfig
+
+//    provided depMap.LeakCanary
+
+/*    testCompile depMap.Annotations
+    testCompile depMap.JUnit
+    androidTestCompile depMap.JUnit
+    androidTestCompile(depMap.EspressoCore, {
+        exclude group: 'com.android.support', module: 'support-annotations'
+        exclude group: 'com.google.code.findbugs'
+    })*/
 }
